@@ -1,0 +1,146 @@
+/* ========================================
+   Window Controls Status Bar Menu Styles
+   ======================================== */
+
+/* Status bar button */
+.theme-statusbar-button {
+	position: relative;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	padding: 0 4px;
+}
+
+.theme-statusbar-button:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+/* Window icon */
+.theme-statusbar-icon {
+	font-size: 14px;
+	user-select: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+}
+
+.theme-statusbar-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+/* Popup menu */
+.theme-statusbar-menu {
+	position: absolute;
+	bottom: 100%;
+	right: 0;
+	width: 220px;
+	margin-bottom: 8px;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	padding: 8px;
+	z-index: 1000;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+/* Menu items */
+.theme-menu-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px;
+	margin-bottom: 4px;
+	border-radius: 4px;
+}
+
+.theme-menu-item:last-child {
+	margin-bottom: 0;
+}
+
+.theme-menu-item:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+/* Menu item labels */
+.theme-menu-item span {
+	font-size: 13px;
+	color: var(--text-normal);
+}
+
+/* Checkbox styling */
+.theme-menu-item input[type="checkbox"] {
+	cursor: pointer;
+	margin: 0;
+}
+
+/* Slider styling */
+.theme-menu-item input[type="range"] {
+	cursor: pointer;
+	width: 80px;
+	margin: 0;
+}
+
+/* Dropdown menu items - stack vertically */
+.theme-menu-dropdown {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+}
+
+.theme-menu-dropdown select {
+	width: 100%;
+	padding: 4px 8px;
+	border-radius: 4px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	color: var(--text-normal);
+	cursor: pointer;
+}
+
+.theme-menu-dropdown select:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+/* Slider menu items */
+.theme-menu-slider {
+	position: relative;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+}
+
+.theme-menu-slider input[type="range"] {
+	width: 100%;
+}
+
+/* Slider tooltip (matches Obsidian's native tooltip) */
+.slider-tooltip {
+	position: absolute;
+	bottom: calc(100% + 4px);
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: #000;
+	color: #fff;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 500;
+	white-space: nowrap;
+	pointer-events: none;
+	z-index: 1001;
+}
+
+.slider-tooltip::after {
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 4px solid transparent;
+	border-top-color: #000;
+}

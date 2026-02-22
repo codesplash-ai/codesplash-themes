@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="550px" height="550px" viewBox="0 0 550 550" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>palette</title>
+    <g id="palette" stroke="none" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
+        <g id="Group" transform="translate(75, 75)" stroke="#62F8C3">
+            <path d="M200,400 C89.54305,400 0,310.45695 0,200 C0,89.54305 89.54305,0 200,0 C310.45695,0 400,80.588745 400,180 C400,235.228475 355.228475,280 300,280 L255,280 C241.742978,280 229.623769,287.490083 223.695048,299.347524 C217.766328,311.204965 219.045787,325.394382 227,336 L233,344 C240.954213,354.605618 242.233672,368.795035 236.304952,380.652476 C230.376231,392.509917 218.257022,400 205,400 L200,400 Z" id="Path" stroke-width="40"></path>
+            <circle id="Oval" stroke-width="40" fill="#62F8C3" cx="230" cy="90" r="10"></circle>
+            <circle id="Oval" stroke-width="40" fill="#62F8C3" cx="310" cy="170" r="10"></circle>
+            <circle id="Oval" stroke-width="40" fill="#62F8C3" cx="90" cy="210" r="10"></circle>
+            <circle id="Oval" stroke-width="40" fill="#62F8C3" cx="130" cy="110" r="10"></circle>
+        </g>
+    </g>
+</svg>

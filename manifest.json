@@ -1,0 +1,11 @@
+{
+  "id": "codesplash-themes",
+  "name": "CodeSplash Themes",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Create, manage, and switch between custom color themes with a visual theme editor.",
+  "author": "Kurtis Pritchard",
+  "authorUrl": "https://codesplash.ai",
+  "fundingUrl": "https://buymeacoffee.com/codesplash.ai",
+  "isDesktopOnly": false
+}

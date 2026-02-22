@@ -1,0 +1,21 @@
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Build output
+main.js
+*.map
+
+# npm
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Logs
+exports/
+
+# Claude Docs
+docs/

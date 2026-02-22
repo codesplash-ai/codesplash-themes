@@ -1,0 +1,133 @@
+/* ========================================
+   Base Structural Styles (from base.css)
+   Always applied regardless of theme mode
+   ======================================== */
+
+body {
+    /* Global */
+    --checklist-done-decoration: none;
+    --file-line-width: 100%;
+    --inline-title-margin-bottom: 0px;
+    --inline-title-size: 22px;
+    --link-decoration: none;
+    --link-external-decoration: none;
+    --link-weight: 500;
+    --p-spacing: 0px;
+    --tag-padding-x: 2px;
+    --tag-size: 14px;
+
+    /* Headers */
+    --h1-size: 20px;
+    --h2-size: 18px;
+    --h3-size: 18px;
+    --h4-size: 18px;
+    --h5-size: 18px;
+    --h6-size: 18px;
+    --h7-size: 18px;
+    --h8-size: 18px;
+}
+
+/* Tags */
+.cm-hashtag {
+    background-color: transparent;
+    font-weight: bold;
+}
+
+a {
+    font-weight: medium;
+}
+
+.image-embed {
+    padding-left: 50px;
+    text-align: left;
+}
+
+.math-block {
+    font-size: 24px;
+}
+
+.math {
+    font-size: 20px;
+}
+
+.markdown-source-view.mod-cm6 .math-block > mjx-container {
+    padding: 2px 0;
+    padding-left: 50px;
+    text-align: left;
+}
+
+mjx-mtable {
+    text-align: left !important;
+    margin-left: 0 !important;
+}
+
+mjx-table {
+    margin-left: 0 !important;
+}
+
+.MJX-TEX * {
+    font-family: "Georgia Pro";
+}
+
+/* Dataview */
+ul.dataview.dataview-ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.dataview.small-text {
+    display: none;
+}
+
+ul.dataview.list-view-ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* Table */
+.markdown-source-view.mod-cm6 .cm-table-widget {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+/* Italics */
+.cm-em,
+.table-wrapper em {
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Strikethrough */
+.cm-strikethrough,
+.table-wrapper del {
+    text-decoration-line: none;
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Highlight */
+.cm-highlight,
+.table-wrapper .cm-highlight,
+.table-wrapper span.cm-highlight,
+.table-wrapper .markdown-rendered mark,
+.table-wrapper mark,
+td mark,
+td .cm-highlight,
+td span[class*="highlight"] {
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Active Menu Rectangular Border */
+.tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-active-menu,
+.tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-active-menu * {
+    border: none !important;
+    border-left: none !important;
+    border-inline-start: none !important;
+    box-shadow: none !important;
+}
+
+/* Active Menu Vertical Border */
+.tree-item-children {
+    border: none !important;
+}

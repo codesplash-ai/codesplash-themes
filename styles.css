@@ -1,0 +1,152 @@
+/* Obsidian Theme Switcher Plugin Styles */
+
+/* ── Settings layout ───────────────────────────────────────── */
+
+.setting-section-spacer {
+    margin-bottom: 2rem;
+}
+
+.theme-editor-spacer {
+    margin-top: 3rem;
+}
+
+.palette-section-spacer {
+    margin-top: 2rem;
+}
+
+/* ── Color Palette Section ─────────────────────────────────── */
+
+.theme-color-palette {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.theme-color-palette .setting-item {
+    border-left: 3px solid var(--interactive-accent);
+    padding-left: 10px;
+    margin-bottom: 8px;
+}
+
+/* Color name inputs in palette rows */
+.theme-color-palette .color-name-input {
+    width: 200px;
+    text-align: left;
+}
+
+/* Wrapper that positions the native picker over the swatch */
+.color-picker-container {
+    display: inline-block;
+    position: relative;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Native color picker – invisible, sits on top of the swatch */
+.color-picker-container input[type="color"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border: none;
+    padding: 0;
+    margin-top: 10px;
+    cursor: pointer;
+    opacity: 0;
+}
+
+/* Visible color swatch */
+.color-swatch {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    cursor: pointer;
+}
+
+/* Color Palette Buttons - consistent width for Add/Delete alignment */
+.theme-color-palette .setting-item-control button {
+    min-width: 70px;
+}
+
+/* ── Color Assignments Section ─────────────────────────────── */
+
+.theme-color-assignments {
+    margin-top: 1rem;
+}
+
+.theme-color-assignments h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-size: calc(var(--h1-size) * 0.75);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.theme-color-assignments .setting-item {
+    padding-left: 1rem;
+}
+
+/* ── Color Input Preview ───────────────────────────────────── */
+
+input[type="text"][placeholder="#000000"],
+input[type="text"][value^="#"] {
+    font-family: monospace;
+}
+
+/* ── Theme List Items ──────────────────────────────────────── */
+
+.setting-item .setting-item-control button {
+    margin-left: 4px;
+}
+
+/* ── General Layout ────────────────────────────────────────── */
+
+.theme-switcher-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Section Headers Spacing */
+.setting-item-heading + .setting-item {
+    margin-bottom: 1rem;
+}
+
+/* Header Size Hierarchy – uses specific selectors instead of !important */
+.vertical-tab-content .setting-item-heading .setting-item-name {
+    font-size: calc(var(--h1-size) * 0.9);
+}
+
+/* ── CTA Buttons ───────────────────────────────────────────── */
+
+.setting-item .setting-item-control button.mod-cta {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.setting-item .setting-item-control button.mod-warning {
+    background-color: var(--text-error);
+    color: var(--text-on-accent);
+}
+
+/* ── Status-bar menu ───────────────────────────────────────── */
+
+.theme-statusbar-menu {
+    display: none;
+}
+
+.theme-statusbar-menu.is-active {
+    display: block;
+}
+
+.slider-tooltip {
+    display: none;
+}
+
+.slider-tooltip.is-active {
+    display: block;
+}
