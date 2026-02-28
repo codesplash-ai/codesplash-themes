@@ -1,7 +1,7 @@
 import { App, Modal, PluginSettingTab, Setting, Notice, Platform } from "obsidian";
 import ThemeSwitcherPlugin from "../main";
-import { Theme, ThemeMode, SEMANTIC_VARIABLES, ColorAssignments } from "./models/Theme";
-import { VIBRANCY_OPTIONS } from "./services/WindowService";
+import { Theme, ColorAssignments } from "./models/Theme";
+import { VIBRANCY_OPTIONS, VibrancyType } from "./services/WindowService";
 
 /**
  * Confirmation modal that replaces browser confirm() with a native Obsidian dialog.
@@ -45,7 +45,6 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 	plugin: ThemeSwitcherPlugin;
 	private currentEditingTheme: Theme | null = null;
 	private originalThemeSnapshot: Theme | null = null;
-	private editingContainer: HTMLElement | null = null;
 
 	constructor(app: App, plugin: ThemeSwitcherPlugin) {
 		super(app, plugin);
@@ -55,8 +54,6 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-
-		new Setting(containerEl).setName("CodeSplash Themes").setHeading();
 
 		containerEl.createDiv({ cls: "setting-section-spacer" });
 
@@ -104,9 +101,11 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 				dropdown
 					.addOptions(themeOptions)
 					.setValue(this.plugin.settings.activeThemeId || "")
-					.onChange(async value => {
-						await this.plugin.setActiveTheme(value || null);
-						new Notice(`Theme changed to: ${value ? themeOptions[value] : "None"}`);
+					.onChange(value => {
+						void (async () => {
+							await this.plugin.setActiveTheme(value || null);
+							new Notice(`Theme changed to: ${value ? themeOptions[value] : "None"}`);
+						})();
 					})
 			);
 	}
@@ -124,10 +123,12 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 			.addToggle(toggle =>
 				toggle
 					.setValue(this.plugin.settings.windowSettings.alwaysOnTop)
-					.onChange(async value => {
-						this.plugin.settings.windowSettings.alwaysOnTop = value;
-						this.plugin.windowService.setAlwaysOnTop(value);
-						await this.plugin.saveSettings();
+					.onChange(value => {
+						void (async () => {
+							this.plugin.settings.windowSettings.alwaysOnTop = value;
+							this.plugin.windowService.setAlwaysOnTop(value);
+							await this.plugin.saveSettings();
+						})();
 					})
 			);
 
@@ -140,11 +141,13 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 					.setLimits(50, 100, 1)
 					.setValue(this.plugin.settings.windowSettings.opacity * 100)
 					.setDynamicTooltip()
-					.onChange(async value => {
-						const opacity = value / 100;
-						this.plugin.settings.windowSettings.opacity = opacity;
-						this.plugin.windowService.setOpacity(opacity);
-						await this.plugin.saveSettings();
+					.onChange(value => {
+						void (async () => {
+							const opacity = value / 100;
+							this.plugin.settings.windowSettings.opacity = opacity;
+							this.plugin.windowService.setOpacity(opacity);
+							await this.plugin.saveSettings();
+						})();
 					})
 			);
 
@@ -162,10 +165,12 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 					dropdown
 						.addOptions(vibrancyOptions)
 						.setValue(this.plugin.settings.windowSettings.vibrancy)
-						.onChange(async value => {
-							this.plugin.settings.windowSettings.vibrancy = value as any;
-							this.plugin.windowService.setVibrancy(value as any);
-							await this.plugin.saveSettings();
+						.onChange(value => {
+							void (async () => {
+								this.plugin.settings.windowSettings.vibrancy = value as VibrancyType;
+								this.plugin.windowService.setVibrancy(value as VibrancyType);
+								await this.plugin.saveSettings();
+							})();
 						})
 				);
 		}
@@ -188,7 +193,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 					.onClick(() => {
 						const theme = this.plugin.themeService.createTheme("New Theme");
 						this.currentEditingTheme = theme;
-						this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 						this.display();
 						new Notice("New theme created");
 					})
@@ -196,7 +201,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 
 		// Import/Export Buttons
 		new Setting(containerEl)
-			.setName("Import/Export")
+			.setName("Import/export")
 			.setDesc("Import or export themes as JSON files")
 			.addButton(button =>
 				button
@@ -231,7 +236,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 					.setButtonText("Edit")
 					.onClick(() => {
 						// Save a snapshot for cancel functionality
-						this.originalThemeSnapshot = JSON.parse(JSON.stringify(theme));
+						this.originalThemeSnapshot = JSON.parse(JSON.stringify(theme)) as Theme;
 						this.currentEditingTheme = theme;
 						this.display();
 					})
@@ -244,7 +249,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 					.onClick(() => {
 						const duplicated = this.plugin.themeService.duplicateTheme(theme.id);
 						if (duplicated) {
-							this.plugin.saveSettings();
+							void this.plugin.saveSettings();
 							this.display();
 							new Notice(`Duplicated: ${theme.name}`);
 						}
@@ -267,17 +272,19 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 						new ConfirmModal(
 							this.app,
 							`Are you sure you want to delete "${theme.name}"?`,
-							async () => {
-								this.plugin.themeService.deleteTheme(theme.id);
+							() => {
+								void (async () => {
+									this.plugin.themeService.deleteTheme(theme.id);
 
-								// If this was the active theme, clear it
-								if (this.plugin.settings.activeThemeId === theme.id) {
-									await this.plugin.setActiveTheme(null);
-								}
+									// If this was the active theme, clear it
+									if (this.plugin.settings.activeThemeId === theme.id) {
+										await this.plugin.setActiveTheme(null);
+									}
 
-								await this.plugin.saveSettings();
-								this.display();
-								new Notice(`Deleted: ${theme.name}`);
+									await this.plugin.saveSettings();
+									this.display();
+									new Notice(`Deleted: ${theme.name}`);
+								})();
 							}
 						).open();
 					})
@@ -303,21 +310,23 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 				button
 					.setButtonText("Save theme")
 					.setCta()
-					.onClick(async () => {
-						// Sort color palette alphabetically before saving
-						const sortedColors: Record<string, string> = {};
-						Object.keys(theme.colors)
-							.sort((a, b) => a.localeCompare(b))
-							.forEach(key => {
-								sortedColors[key] = theme.colors[key];
-							});
-						theme.colors = sortedColors;
+					.onClick(() => {
+						void (async () => {
+							// Sort color palette alphabetically before saving
+							const sortedColors: Record<string, string> = {};
+							Object.keys(theme.colors)
+								.sort((a, b) => a.localeCompare(b))
+								.forEach(key => {
+									sortedColors[key] = theme.colors[key];
+								});
+							theme.colors = sortedColors;
 
-						await this.plugin.saveSettings();
-						this.originalThemeSnapshot = null;
-						this.currentEditingTheme = null;
-						this.display();
-						new Notice(`Saved: ${theme.name}`);
+							await this.plugin.saveSettings();
+							this.originalThemeSnapshot = null;
+							this.currentEditingTheme = null;
+							this.display();
+							new Notice(`Saved: ${theme.name}`);
+						})();
 					})
 			)
 			.addButton(button =>
@@ -406,25 +415,27 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 				placeholder: "color-name",
 				cls: "color-name-input"
 			});
-			nameInput.addEventListener("change", async (e) => {
-				const newName = (e.target as HTMLInputElement).value.trim();
-				if (newName && newName !== colorName && !theme.colors[newName]) {
-					// Rename the color
-					theme.colors[newName] = theme.colors[colorName];
-					delete theme.colors[colorName];
+			nameInput.addEventListener("change", (e) => {
+				void (async () => {
+					const newName = (e.target as HTMLInputElement).value.trim();
+					if (newName && newName !== colorName && !theme.colors[newName]) {
+						// Rename the color
+						theme.colors[newName] = theme.colors[colorName];
+						delete theme.colors[colorName];
 
-					// Update assignments that reference this color
-					const oldRef = `var(--${colorName})`;
-					const newRef = `var(--${newName})`;
-					Object.keys(theme.assignments).forEach(key => {
-						if (theme.assignments[key as keyof ColorAssignments] === oldRef) {
-							theme.assignments[key as keyof ColorAssignments] = newRef;
-						}
-					});
+						// Update assignments that reference this color
+						const oldRef = `var(--${colorName})`;
+						const newRef = `var(--${newName})`;
+						Object.keys(theme.assignments).forEach(key => {
+							if (theme.assignments[key as keyof ColorAssignments] === oldRef) {
+								theme.assignments[key as keyof ColorAssignments] = newRef;
+							}
+						});
 
-					await this.plugin.saveSettings();
-					this.display();
-				}
+						await this.plugin.saveSettings();
+						this.display();
+					}
+				})();
 			});
 
 			// Container for color picker and swatch
@@ -438,7 +449,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 
 			// Color preview swatch (visible behind picker)
 			const swatchEl = colorContainer.createDiv({ cls: "color-swatch" });
-			swatchEl.style.backgroundColor = colorValue;
+			swatchEl.setCssStyles({ backgroundColor: colorValue });
 
 			// Click swatch to open color picker
 			swatchEl.addEventListener("click", () => {
@@ -460,23 +471,25 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 					const value = (e.target as HTMLInputElement).value;
 					// Update swatch and color picker preview immediately as user types
 					if (this.isValidColor(value)) {
-						swatchEl.style.backgroundColor = value;
+						swatchEl.setCssStyles({ backgroundColor: value });
 						colorPickerEl.value = value;
 					}
 				});
 
 				// Save on blur/change
-				hexInputEl.addEventListener("change", async (e: Event) => {
-					const value = (e.target as HTMLInputElement).value;
-					if (this.isValidColor(value)) {
-						theme.colors[colorName] = value;
-						await this.plugin.saveSettings();
+				hexInputEl.addEventListener("change", (e: Event) => {
+					void (async () => {
+						const value = (e.target as HTMLInputElement).value;
+						if (this.isValidColor(value)) {
+							theme.colors[colorName] = value;
+							await this.plugin.saveSettings();
 
-						// Re-apply theme if it's active
-						if (this.plugin.settings.activeThemeId === theme.id) {
-							this.plugin.styleService.applyTheme(theme);
+							// Re-apply theme if it's active
+							if (this.plugin.settings.activeThemeId === theme.id) {
+								this.plugin.reapplyActiveTheme();
+							}
 						}
-					}
+					})();
 				});
 			});
 
@@ -486,20 +499,22 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 				if (hexInputEl) {
 					hexInputEl.value = value;
 				}
-				swatchEl.style.backgroundColor = value;
+				swatchEl.setCssStyles({ backgroundColor: value });
 				theme.colors[colorName] = value;
 			});
 
 			// Save when color picker closes
-			colorPickerEl.addEventListener("change", async (e: Event) => {
-				const value = (e.target as HTMLInputElement).value;
-				theme.colors[colorName] = value;
-				await this.plugin.saveSettings();
+			colorPickerEl.addEventListener("change", (e: Event) => {
+				void (async () => {
+					const value = (e.target as HTMLInputElement).value;
+					theme.colors[colorName] = value;
+					await this.plugin.saveSettings();
 
-				// Re-apply theme if it's active
-				if (this.plugin.settings.activeThemeId === theme.id) {
-					this.plugin.styleService.applyTheme(theme);
-				}
+					// Re-apply theme if it's active
+					if (this.plugin.settings.activeThemeId === theme.id) {
+						this.plugin.reapplyActiveTheme();
+					}
+				})();
 			});
 
 			// Delete button (right-aligned)
@@ -507,19 +522,21 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 				button
 					.setButtonText("Delete")
 					.setWarning()
-					.onClick(async () => {
-						delete theme.colors[colorName];
+					.onClick(() => {
+						void (async () => {
+							delete theme.colors[colorName];
 
-						// Remove any assignments using this color
-						const varRef = `var(--${colorName})`;
-						Object.keys(theme.assignments).forEach(key => {
-							if (theme.assignments[key as keyof ColorAssignments] === varRef) {
-								delete theme.assignments[key as keyof ColorAssignments];
-							}
-						});
+							// Remove any assignments using this color
+							const varRef = `var(--${colorName})`;
+							Object.keys(theme.assignments).forEach(key => {
+								if (theme.assignments[key as keyof ColorAssignments] === varRef) {
+									delete theme.assignments[key as keyof ColorAssignments];
+								}
+							});
 
-						await this.plugin.saveSettings();
-						this.display();
+							await this.plugin.saveSettings();
+							this.display();
+						})();
 					})
 			);
 		});
@@ -546,7 +563,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 
 		// Color preview swatch (visible behind picker)
 		const addSwatchEl = addColorContainer.createDiv({ cls: "color-swatch" });
-		addSwatchEl.style.backgroundColor = "#000000";
+		addSwatchEl.setCssStyles({ backgroundColor: "#000000" });
 
 		// Click swatch to open color picker
 		addSwatchEl.addEventListener("click", () => {
@@ -566,7 +583,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 				const value = (e.target as HTMLInputElement).value;
 				// Update swatch and color picker preview immediately as user types
 				if (this.isValidColor(value)) {
-					addSwatchEl.style.backgroundColor = value;
+					addSwatchEl.setCssStyles({ backgroundColor: value });
 					addColorPickerEl.value = value;
 				}
 			});
@@ -578,7 +595,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 			if (addHexInputEl) {
 				addHexInputEl.value = value;
 			}
-			addSwatchEl.style.backgroundColor = value;
+			addSwatchEl.setCssStyles({ backgroundColor: value });
 		});
 
 		// Add button
@@ -586,18 +603,20 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 			button
 				.setButtonText("Add")
 				.setCta()
-				.onClick(async () => {
-					const name = addNameInput.value.trim();
-					const color = addHexInputEl?.value.trim() || '';
+				.onClick(() => {
+					void (async () => {
+						const name = addNameInput.value.trim();
+						const color = addHexInputEl?.value.trim() || '';
 
-					if (name && color && this.isValidColor(color)) {
-						theme.colors[name] = color;
-						await this.plugin.saveSettings();
-						this.display();
-						new Notice(`Added color: ${name}`);
-					} else {
-						new Notice("Invalid color name or value");
-					}
+						if (name && color && this.isValidColor(color)) {
+							theme.colors[name] = color;
+							await this.plugin.saveSettings();
+							this.display();
+							new Notice(`Added color: ${name}`);
+						} else {
+							new Notice("Invalid color name or value");
+						}
+					})();
 				})
 		);
 	}
@@ -640,19 +659,21 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 						dropdown
 							.addOptions(colorOptions)
 							.setValue(currentValue)
-							.onChange(async value => {
-								if (value) {
-									theme.assignments[varName as keyof ColorAssignments] = value;
-								} else {
-									delete theme.assignments[varName as keyof ColorAssignments];
-								}
+							.onChange(value => {
+								void (async () => {
+									if (value) {
+										theme.assignments[varName as keyof ColorAssignments] = value;
+									} else {
+										delete theme.assignments[varName as keyof ColorAssignments];
+									}
 
-								await this.plugin.saveSettings();
+									await this.plugin.saveSettings();
 
-								// Re-apply theme if it's active
-								if (this.plugin.settings.activeThemeId === theme.id) {
-									this.plugin.styleService.applyTheme(theme);
-								}
+									// Re-apply theme if it's active
+									if (this.plugin.settings.activeThemeId === theme.id) {
+										this.plugin.reapplyActiveTheme();
+									}
+								})();
 							})
 					);
 			});
@@ -666,23 +687,25 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 		const input = document.createElement("input");
 		input.type = "file";
 		input.accept = ".json";
-		input.onchange = async (e) => {
-			const file = (e.target as HTMLInputElement).files?.[0];
-			if (!file) return;
+		input.onchange = (e) => {
+			void (async () => {
+				const file = (e.target as HTMLInputElement).files?.[0];
+				if (!file) return;
 
-			try {
-				const text = await file.text();
-				const themeData = JSON.parse(text);
-				const theme = this.plugin.themeService.importTheme(themeData);
+				try {
+					const text = await file.text();
+					const themeData: unknown = JSON.parse(text);
+					const theme = this.plugin.themeService.importTheme(themeData);
 
-				if (theme) {
-					await this.plugin.saveSettings();
-					this.display();
-					new Notice(`Imported: ${theme.name}`);
+					if (theme) {
+						await this.plugin.saveSettings();
+						this.display();
+						new Notice(`Imported: ${theme.name}`);
+					}
+				} catch (error) {
+					new Notice("Failed to import theme: " + (error instanceof Error ? error.message : String(error)));
 				}
-			} catch (error) {
-				new Notice("Failed to import theme: " + (error instanceof Error ? error.message : String(error)));
-			}
+			})();
 		};
 		input.click();
 	}

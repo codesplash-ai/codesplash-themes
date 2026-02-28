@@ -115,13 +115,16 @@ export function createEmptyTheme(id: string, name: string): Theme {
 /**
  * Validates that a theme has all required properties
  */
-export function validateTheme(theme: any): theme is Theme {
+export function validateTheme(theme: unknown): theme is Theme {
+	if (typeof theme !== "object" || theme === null) {
+		return false;
+	}
+	const t = theme as Record<string, unknown>;
 	return (
-		typeof theme === "object" &&
-		typeof theme.id === "string" &&
-		typeof theme.name === "string" &&
-		typeof theme.colors === "object" &&
-		typeof theme.assignments === "object" &&
-		typeof theme.isBuiltin === "boolean"
+		typeof t.id === "string" &&
+		typeof t.name === "string" &&
+		typeof t.colors === "object" &&
+		typeof t.assignments === "object" &&
+		typeof t.isBuiltin === "boolean"
 	);
 }

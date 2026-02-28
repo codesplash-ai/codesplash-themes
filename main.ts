@@ -28,6 +28,20 @@ const DEFAULT_SETTINGS: ThemeSwitcherSettings = {
 	},
 };
 
+interface ObsidianInternalApi {
+	commands?: {
+		executeCommandById?(id: string): unknown;
+		commands?: Record<string, unknown>;
+	};
+	setTheme?(theme: string): unknown;
+	vault?: {
+		setConfig?(key: string, value: string): unknown;
+	} & Record<string, unknown>;
+	workspace?: {
+		trigger?(event: string): void;
+	};
+}
+
 export default class ThemeSwitcherPlugin extends Plugin {
 	settings: ThemeSwitcherSettings;
 	themeService: ThemeService;
@@ -35,13 +49,14 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	windowService: WindowService;
 	private themeChangeObserver: MutationObserver | null = null;
 	private statusBarItem: HTMLElement | null = null;
+	private isApplyingTheme = false;
 
 	async onload() {
 		await this.loadSettings();
 
 		// Initialize services
 		this.themeService = new ThemeService(this.settings.themes);
-		this.styleService = new StyleService(this.app, this.manifest.dir || "");
+		this.styleService = new StyleService();
 		this.windowService = new WindowService();
 
 		// Keep Obsidian's base light/dark mode in sync with the active theme on startup.
@@ -51,7 +66,7 @@ export default class ThemeSwitcherPlugin extends Plugin {
 		}
 
 		// Always apply base styles, with or without a color theme
-		await this.applyCurrentTheme(initialTheme?.mode);
+		this.applyCurrentTheme(initialTheme?.mode);
 
 		// Apply window settings (desktop only)
 		if (this.windowService.isDesktop()) {
@@ -88,9 +103,8 @@ export default class ThemeSwitcherPlugin extends Plugin {
 		this.addCommand({
 			id: "reload-css",
 			name: "Reload CSS from disk",
-			callback: async () => {
-				this.styleService.clearCache();
-				await this.applyCurrentTheme();
+			callback: () => {
+				this.applyCurrentTheme();
 			},
 		});
 
@@ -99,18 +113,23 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	/**
 	 * Apply the current theme (or just base styles if no theme selected)
 	 */
-	private async applyCurrentTheme(modeOverride?: ThemeMode) {
-		if (this.settings.activeThemeId) {
-			const activeTheme = this.themeService.getTheme(this.settings.activeThemeId);
-			if (activeTheme) {
-				await this.styleService.applyTheme(activeTheme, modeOverride);
+	private applyCurrentTheme(modeOverride?: ThemeMode) {
+		this.isApplyingTheme = true;
+		try {
+			if (this.settings.activeThemeId) {
+				const activeTheme = this.themeService.getTheme(this.settings.activeThemeId);
+				if (activeTheme) {
+					this.styleService.applyTheme(activeTheme, modeOverride);
+				} else {
+					// Theme not found, apply base styles only
+					this.styleService.applyBaseStyles();
+				}
 			} else {
-				// Theme not found, apply base styles only
-				await this.styleService.applyBaseStyles();
+				// No theme selected, apply base styles only
+				this.styleService.applyBaseStyles();
 			}
-		} else {
-			// No theme selected, apply base styles only
-			await this.styleService.applyBaseStyles();
+		} finally {
+			this.isApplyingTheme = false;
 		}
 	}
 
@@ -131,22 +150,22 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	 * Execute an Obsidian command by id, while handling command id differences across versions.
 	 */
 	private async executeObsidianCommand(commandId: string): Promise<boolean> {
-		// @ts-ignore - commands manager exists at runtime but is not in public types
-		const commands = (this.app as any).commands;
+		const appInternal = this.app as unknown as ObsidianInternalApi;
+		const commands = appInternal.commands;
 		if (!commands?.executeCommandById) {
 			return false;
 		}
 
 		// If the registry is available and command is missing, skip execution.
-		const registry = commands.commands as Record<string, unknown> | undefined;
+		const registry = commands.commands;
 		if (registry && !registry[commandId]) {
 			return false;
 		}
 
 		try {
-			const result = commands.executeCommandById(commandId);
+			const result: unknown = commands.executeCommandById(commandId);
 			if (result instanceof Promise) {
-				const resolved = await result;
+				const resolved: unknown = await result;
 				return resolved !== false;
 			}
 			return result !== false;
@@ -188,9 +207,8 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	 * Try Obsidian's internal setTheme API when command ids are unavailable.
 	 */
 	private async trySetThemeApi(targetMode: ThemeMode): Promise<boolean> {
-		const appAny = this.app as any;
-		const setTheme = appAny?.setTheme;
-		if (typeof setTheme !== "function") {
+		const appInternal = this.app as unknown as ObsidianInternalApi;
+		if (typeof appInternal?.setTheme !== "function") {
 			return false;
 		}
 
@@ -200,7 +218,7 @@ export default class ThemeSwitcherPlugin extends Plugin {
 
 		for (const candidate of candidates) {
 			try {
-				const result = setTheme.call(appAny, candidate);
+				const result: unknown = appInternal.setTheme(candidate);
 				if (result instanceof Promise) {
 					await result;
 				}
@@ -220,10 +238,9 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	 * Try internal config setters to persist/apply base mode for older/newer internals.
 	 */
 	private async trySetVaultConfigMode(targetMode: ThemeMode): Promise<boolean> {
-		const appAny = this.app as any;
-		const vault = appAny?.vault;
-		const setConfig = vault?.setConfig;
-		if (typeof setConfig !== "function") {
+		const appInternal = this.app as unknown as ObsidianInternalApi;
+		const vault = appInternal?.vault;
+		if (typeof vault?.setConfig !== "function") {
 			return false;
 		}
 
@@ -239,11 +256,11 @@ export default class ThemeSwitcherPlugin extends Plugin {
 
 		for (const [key, value] of configAttempts) {
 			try {
-				const result = setConfig.call(vault, key, value);
+				const result: unknown = vault.setConfig(key, value);
 				if (result instanceof Promise) {
 					await result;
 				}
-				appAny?.workspace?.trigger?.("css-change");
+				appInternal?.workspace?.trigger?.("css-change");
 			} catch {
 				continue;
 			}
@@ -268,8 +285,8 @@ export default class ThemeSwitcherPlugin extends Plugin {
 		body.classList.toggle("theme-dark", targetMode === "dark");
 		body.classList.toggle("theme-light", targetMode === "light");
 
-		const appAny = this.app as any;
-		appAny?.workspace?.trigger?.("css-change");
+		const appInternal = this.app as unknown as ObsidianInternalApi;
+		appInternal?.workspace?.trigger?.("css-change");
 
 		return body.classList.contains(targetMode === "dark" ? "theme-dark" : "theme-light");
 	}
@@ -313,8 +330,14 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	 * Setup observer to watch for light/dark mode changes
 	 */
 	private setupThemeModeObserver() {
+		let lastMode = this.getCurrentMode();
 		this.themeChangeObserver = new MutationObserver(() => {
-			void this.applyCurrentTheme();
+			if (this.isApplyingTheme) return;
+			const currentMode = this.getCurrentMode();
+			if (currentMode !== lastMode) {
+				lastMode = currentMode;
+				this.applyCurrentTheme();
+			}
 		});
 		this.themeChangeObserver.observe(document.body, {
 			attributes: true,
@@ -339,7 +362,19 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		let data: Partial<ThemeSwitcherSettings> | null = null;
+		try {
+			const configDir = this.manifest.dir;
+			if (configDir) {
+				const raw = await this.app.vault.adapter.read(`${configDir}/data.json`);
+				if (raw?.trim()) {
+					data = JSON.parse(raw) as Partial<ThemeSwitcherSettings>;
+				}
+			}
+		} catch {
+			// data.json missing or corrupted — use defaults
+		}
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 	}
 
 	async saveSettings() {
@@ -352,18 +387,23 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	 * Set the active theme
 	 */
 	async setActiveTheme(themeId: string | null) {
-		this.settings.activeThemeId = themeId;
-		const theme = themeId ? this.themeService.getTheme(themeId) : undefined;
+		this.isApplyingTheme = true;
+		try {
+			this.settings.activeThemeId = themeId;
+			const theme = themeId ? this.themeService.getTheme(themeId) : undefined;
 
-		// Switch Obsidian mode based on theme's mode setting
-		if (theme?.mode) {
-			await this.switchObsidianMode(theme.mode);
-			await this.applyCurrentTheme(theme.mode);
-		} else {
-			await this.applyCurrentTheme();
+			// Switch Obsidian mode based on theme's mode setting
+			if (theme?.mode) {
+				await this.switchObsidianMode(theme.mode);
+				this.applyCurrentTheme(theme.mode);
+			} else {
+				this.applyCurrentTheme();
+			}
+
+			await this.saveSettings();
+		} finally {
+			this.isApplyingTheme = false;
 		}
-
-		await this.saveSettings();
 	}
 
 	/**
@@ -396,14 +436,27 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	 * Toggle theme on/off
 	 */
 	toggleTheme() {
-		if (this.styleService.isThemeApplied()) {
-			this.styleService.removeTheme();
-		} else if (this.settings.activeThemeId) {
-			const theme = this.themeService.getTheme(this.settings.activeThemeId);
-			if (theme) {
-				this.styleService.applyTheme(theme);
+		this.isApplyingTheme = true;
+		try {
+			if (this.styleService.isThemeApplied()) {
+				this.styleService.removeTheme();
+			} else if (this.settings.activeThemeId) {
+				const theme = this.themeService.getTheme(this.settings.activeThemeId);
+				if (theme) {
+					this.styleService.applyTheme(theme);
+				}
 			}
+		} finally {
+			this.isApplyingTheme = false;
 		}
+	}
+
+	/**
+	 * Re-apply the active theme with the isApplyingTheme guard.
+	 * Use this from settings instead of calling styleService.applyTheme() directly.
+	 */
+	reapplyActiveTheme(): void {
+		this.applyCurrentTheme();
 	}
 
 	/**
@@ -460,10 +513,12 @@ export default class ThemeSwitcherPlugin extends Plugin {
 			type: "checkbox",
 		});
 		alwaysOnTopToggle.checked = this.settings.windowSettings.alwaysOnTop;
-		alwaysOnTopToggle.addEventListener("change", async () => {
-			this.settings.windowSettings.alwaysOnTop = alwaysOnTopToggle.checked;
-			this.windowService.setAlwaysOnTop(alwaysOnTopToggle.checked);
-			await this.saveSettings();
+		alwaysOnTopToggle.addEventListener("change", () => {
+			void (async () => {
+				this.settings.windowSettings.alwaysOnTop = alwaysOnTopToggle.checked;
+				this.windowService.setAlwaysOnTop(alwaysOnTopToggle.checked);
+				await this.saveSettings();
+			})();
 		});
 
 		// Opacity slider with tooltip
@@ -490,19 +545,21 @@ export default class ThemeSwitcherPlugin extends Plugin {
 		opacitySlider.addEventListener("mouseleave", () => {
 			opacityTooltip.removeClass("is-active");
 		});
-		opacitySlider.addEventListener("input", async () => {
-			const opacity = parseInt(opacitySlider.value) / 100;
-			opacityTooltip.setText(opacitySlider.value);
-			// Update tooltip position
-			const percent = (parseInt(opacitySlider.value) - 50) / 50;
-			opacityTooltip.style.left = `calc(${percent * 100}% - 12px)`;
-			this.settings.windowSettings.opacity = opacity;
-			this.windowService.setOpacity(opacity);
-			await this.saveSettings();
+		opacitySlider.addEventListener("input", () => {
+			void (async () => {
+				const opacity = parseInt(opacitySlider.value) / 100;
+				opacityTooltip.setText(opacitySlider.value);
+				// Update tooltip position
+				const percent = (parseInt(opacitySlider.value) - 50) / 50;
+				opacityTooltip.setCssStyles({ left: `calc(${percent * 100}% - 12px)` });
+				this.settings.windowSettings.opacity = opacity;
+				this.windowService.setOpacity(opacity);
+				await this.saveSettings();
+			})();
 		});
 		// Initialize tooltip position
 		const initialPercent = (this.settings.windowSettings.opacity * 100 - 50) / 50;
-		opacityTooltip.style.left = `calc(${initialPercent * 100}% - 12px)`;
+		opacityTooltip.setCssStyles({ left: `calc(${initialPercent * 100}% - 12px)` });
 
 		// Vibrancy dropdown (macOS only)
 		if (this.windowService.isMacOS()) {
@@ -518,10 +575,12 @@ export default class ThemeSwitcherPlugin extends Plugin {
 			});
 			vibrancyDropdown.value = this.settings.windowSettings.vibrancy;
 
-			vibrancyDropdown.addEventListener("change", async () => {
-				this.settings.windowSettings.vibrancy = vibrancyDropdown.value as any;
-				this.windowService.setVibrancy(vibrancyDropdown.value as any);
-				await this.saveSettings();
+			vibrancyDropdown.addEventListener("change", () => {
+				void (async () => {
+					this.settings.windowSettings.vibrancy = vibrancyDropdown.value as VibrancyType;
+					this.windowService.setVibrancy(vibrancyDropdown.value as VibrancyType);
+					await this.saveSettings();
+				})();
 			});
 		}
 
@@ -546,8 +605,10 @@ export default class ThemeSwitcherPlugin extends Plugin {
 		};
 		updateThemeDropdown();
 
-		themeDropdown.addEventListener("change", async () => {
-			await this.setActiveTheme(themeDropdown.value || null);
+		themeDropdown.addEventListener("change", () => {
+			void (async () => {
+				await this.setActiveTheme(themeDropdown.value || null);
+			})();
 		});
 
 		// Toggle menu visibility on click

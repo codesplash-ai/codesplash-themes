@@ -38,6 +38,12 @@ export const VIBRANCY_OPTIONS: VibrancyType[] = [
 	"window",
 ];
 
+interface ElectronBrowserWindow {
+	setAlwaysOnTop(flag: boolean): void;
+	setOpacity(opacity: number): void;
+	setVibrancy(type: string | null): void;
+}
+
 /**
  * Service for managing Electron window properties
  * Gracefully handles mobile/unsupported platforms
@@ -60,15 +66,15 @@ export class WindowService {
 	/**
 	 * Get Electron window instance (desktop only)
 	 */
-	private getCurrentWindow(): any {
+	private getCurrentWindow(): ElectronBrowserWindow | null {
 		if (!this.isDesktop()) {
 			return null;
 		}
 
 		try {
-			return (window as any).require("electron").remote.getCurrentWindow();
+			return (window as unknown as { require: (m: string) => { remote: { getCurrentWindow(): ElectronBrowserWindow } } })
+				.require("electron").remote.getCurrentWindow();
 		} catch {
-			//("Failed to get Electron window:", error);
 			return null;
 		}
 	}

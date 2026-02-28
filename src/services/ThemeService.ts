@@ -43,7 +43,7 @@ export class ThemeService {
 				const updatedAssignments: Record<string, string> = { ...savedTheme.assignments };
 
 				// Add any missing assignments from the default theme
-				for (const [key, value] of Object.entries(defaultTheme.assignments)) {
+				for (const [key, value] of Object.entries(defaultTheme.assignments) as [string, string | undefined][]) {
 					if (!(key in updatedAssignments) && value) {
 						updatedAssignments[key] = value;
 						needsUpdate = true;
@@ -145,7 +145,7 @@ export class ThemeService {
 	/**
 	 * Import a theme from JSON
 	 */
-	importTheme(themeData: any): Theme | undefined {
+	importTheme(themeData: unknown): Theme | undefined {
 		if (!validateTheme(themeData)) {
 			throw new Error("Invalid theme data");
 		}

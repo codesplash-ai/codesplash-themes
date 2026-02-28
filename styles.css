@@ -133,20 +133,623 @@ input[type="text"][value^="#"] {
     color: var(--text-on-accent);
 }
 
-/* ── Status-bar menu ───────────────────────────────────────── */
+/* ========================================================================
+   Theme styles — gated behind body.codesplash-active
+   All rules below are inert when no theme is active.
+   ======================================================================== */
 
+/* ── Theme: Base structural styles (from base.css) ─────────── */
+
+body.codesplash-active {
+    /* Global */
+    --checklist-done-decoration: none;
+    --file-line-width: 100%;
+    --inline-title-margin-bottom: 0px;
+    --inline-title-size: 22px;
+    --link-decoration: none;
+    --link-external-decoration: none;
+    --link-weight: 500;
+    --p-spacing: 0px;
+    --tag-padding-x: 2px;
+    --tag-size: 14px;
+
+    /* Headers */
+    --h1-size: 20px;
+    --h2-size: 18px;
+    --h3-size: 18px;
+    --h4-size: 18px;
+    --h5-size: 18px;
+    --h6-size: 18px;
+    --h7-size: 18px;
+    --h8-size: 18px;
+}
+
+/* Tags – structural */
+body.codesplash-active .cm-hashtag {
+    background-color: transparent;
+    font-weight: bold;
+}
+
+body.codesplash-active a {
+    font-weight: medium;
+}
+
+body.codesplash-active .image-embed {
+    padding-left: 50px;
+    text-align: left;
+}
+
+body.codesplash-active .math-block {
+    font-size: 24px;
+}
+
+body.codesplash-active .math {
+    font-size: 20px;
+}
+
+body.codesplash-active .markdown-source-view.mod-cm6 .math-block > mjx-container {
+    padding: 2px 0;
+    padding-left: 50px;
+    text-align: left;
+}
+
+body.codesplash-active mjx-mtable {
+    text-align: left !important;
+    margin-left: 0 !important;
+}
+
+body.codesplash-active mjx-table {
+    margin-left: 0 !important;
+}
+
+body.codesplash-active .MJX-TEX * {
+    font-family: "Georgia Pro";
+}
+
+/* Dataview */
+body.codesplash-active ul.dataview.dataview-ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+body.codesplash-active .dataview.small-text {
+    display: none;
+}
+
+body.codesplash-active ul.dataview.list-view-ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* Table */
+body.codesplash-active .markdown-source-view.mod-cm6 .cm-table-widget {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+/* Italics – structural */
+body.codesplash-active .cm-em,
+body.codesplash-active .table-wrapper em {
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Strikethrough – structural */
+body.codesplash-active .cm-strikethrough,
+body.codesplash-active .table-wrapper del {
+    text-decoration-line: none;
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Highlight – structural */
+body.codesplash-active .cm-highlight,
+body.codesplash-active .table-wrapper .cm-highlight,
+body.codesplash-active .table-wrapper span.cm-highlight,
+body.codesplash-active .table-wrapper .markdown-rendered mark,
+body.codesplash-active .table-wrapper mark,
+body.codesplash-active td mark,
+body.codesplash-active td .cm-highlight,
+body.codesplash-active td span[class*="highlight"] {
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Active Menu Rectangular Border */
+body.codesplash-active .tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-active-menu,
+body.codesplash-active .tree-item-self.nav-folder-title.is-clickable.mod-collapsible.has-active-menu * {
+    border: none !important;
+    border-left: none !important;
+    border-inline-start: none !important;
+    box-shadow: none !important;
+}
+
+/* Active Menu Vertical Border */
+body.codesplash-active .tree-item-children {
+    border: none !important;
+}
+
+/* ── Theme: Dark mode variable mappings (from base-dark.css) ── */
+
+body.codesplash-active.theme-dark {
+    --background-primary: var(--BACKGROUND-PRIMARY);
+    --background-secondary: var(--BACKGROUND-SECONDARY);
+    --code-background: var(--BACKGROUND-SECONDARY);
+    --code-normal: var(--TEXT);
+    --nav-item-color: var(--TEXT);
+    --text-highlight-bg: var(--BACKGROUND-PRIMARY);
+    --text-normal: var(--TEXT);
+    --titlebar-background-focused: var(--BACKGROUND-SECONDARY);
+
+    --inline-title-color: var(--TITLE);
+    --link-color: var(--LINK);
+    --link-color-hover: var(--ACTION);
+    --link-external-color: var(--LINK);
+    --link-external-color-hover: var(--ACTION);
+    --bold-color: var(--BOLD);
+    --list-marker-color: var(--LIST);
+    --checkbox-color: var(--LIST);
+    --caret-color: var(--CARET);
+    --table-header-color: var(--HEADER);
+
+    --background-modifier-hover: var(--BACKGROUND-SECONDARY);
+    --nav-item-background-active: var(--BACKGROUND-SECONDARY);
+    --nav-item-color-active: var(--TEXT);
+    --nav-item-color-hover: var(--TEXT);
+
+    --tab-text-color-active: var(--ACCENT);
+    --tab-text-color-focused: var(--TEXT);
+    --tab-text-color-focused-active: var(--ACCENT);
+    --tab-text-color-focused-active-current: var(--ACCENT);
+    --icon-color-focused: var(--TEXT);
+    --icon-color-hover: var(--TEXT);
+
+    --vault-profile-color-hover: var(--TEXT);
+    --tab-container-background: var(--BACKGROUND-SECONDARY);
+}
+
+/* ── Theme: Light mode variable mappings (from base-light.css) ── */
+
+body.codesplash-active.theme-light {
+    --background-primary: var(--BACKGROUND-PRIMARY);
+    --background-secondary: var(--BACKGROUND-SECONDARY);
+    --code-background: var(--BACKGROUND-SECONDARY);
+    --code-normal: var(--TEXT);
+    --nav-item-color: var(--TEXT);
+    --text-highlight-bg: var(--BACKGROUND-PRIMARY);
+    --text-normal: var(--TEXT);
+    --titlebar-background-focused: var(--BACKGROUND-SECONDARY);
+
+    --inline-title-color: var(--TITLE);
+    --link-color: var(--LINK);
+    --link-color-hover: var(--ACTION);
+    --link-external-color: var(--LINK);
+    --link-external-color-hover: var(--ACTION);
+    --bold-color: var(--BOLD);
+    --list-marker-color: var(--LIST);
+    --checkbox-color: var(--LIST);
+    --caret-color: var(--CARET);
+    --table-header-color: var(--HEADER);
+
+    --background-modifier-hover: var(--BACKGROUND-SECONDARY);
+    --nav-item-background-active: var(--BACKGROUND-SECONDARY);
+    --nav-item-color-active: var(--TEXT);
+    --nav-item-color-hover: var(--TEXT);
+
+    --tab-text-color-active: var(--ACCENT);
+    --tab-text-color-focused: var(--TEXT);
+    --tab-text-color-focused-active: var(--ACCENT);
+    --tab-text-color-focused-active-current: var(--ACCENT);
+    --icon-color-focused: var(--TEXT);
+    --icon-color-hover: var(--TEXT);
+
+    --vault-profile-color-hover: var(--TEXT);
+    --tab-container-background: var(--BACKGROUND-SECONDARY);
+}
+
+/* ── Theme: Shared element rules (deduplicated dark + light) ── */
+
+/* Table Selection */
+body.codesplash-active td.is-selected {
+    background-color: var(--BACKGROUND-HIGHTLIGHT) !important;
+}
+
+/* Text Selection */
+body.codesplash-active ::selection {
+    background: var(--BACKGROUND-HIGHTLIGHT) !important;
+}
+
+/* Quote Text */
+body.codesplash-active .HyperMD-quote {
+    background-color: var(--BACKGROUND-SECONDARY) !important;
+    border-left: 5px solid var(--ACTION) !important;
+}
+
+body.codesplash-active .HyperMD-quote::before,
+body.codesplash-active .cm-quote::before {
+    content: none !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* Headers */
+body.codesplash-active .cm-header-1 {
+    color: var(--HEADER-1);
+}
+
+body.codesplash-active .cm-header-2 {
+    color: var(--HEADER-2);
+}
+
+body.codesplash-active .cm-header-3 {
+    color: var(--HEADER-3);
+}
+
+body.codesplash-active .cm-header-4 {
+    color: var(--HEADER-4);
+}
+
+body.codesplash-active .cm-header-5 {
+    color: var(--HEADER-5);
+}
+
+body.codesplash-active .cm-header-6 {
+    color: var(--HEADER-6);
+}
+
+/* Horizontal Line */
+body.codesplash-active div.hr hr {
+    border-top: 2px solid var(--LINE_BREAK);
+}
+
+/* Bold */
+body.codesplash-active .cm-strong {
+    color: var(--BOLD);
+}
+
+/* Italics – color */
+body.codesplash-active .cm-em,
+body.codesplash-active .table-wrapper em {
+    color: var(--ITALICS);
+}
+
+/* Highlight – color */
+body.codesplash-active .cm-highlight,
+body.codesplash-active .table-wrapper .cm-highlight,
+body.codesplash-active .table-wrapper span.cm-highlight,
+body.codesplash-active .table-wrapper .markdown-rendered mark,
+body.codesplash-active .table-wrapper mark,
+body.codesplash-active td mark,
+body.codesplash-active td .cm-highlight,
+body.codesplash-active td span[class*="highlight"] {
+    color: var(--HIGHLIGHT) !important;
+}
+
+/* Strikethrough – color */
+body.codesplash-active .cm-strikethrough,
+body.codesplash-active .table-wrapper del {
+    color: var(--STRIKETHROUGH);
+}
+
+/* Tags – color */
+body.codesplash-active .cm-hashtag {
+    color: var(--TAGS);
+}
+
+/* Active Line */
+body.codesplash-active .cm-active.cm-line {
+    background-color: var(--BACKGROUND-PRIMARY) !important;
+}
+
+/* Active Line Active Tab */
+body.codesplash-active .mod-active .cm-active.cm-line {
+    background-color: var(--BACKGROUND-CURRENT-LINE) !important;
+}
+
+/* Paragraphs */
+body.codesplash-active .cm-line {
+    color: var(--TEXT);
+}
+
+/* Side Menu: Active */
+body.codesplash-active .nav-file-title.is-active,
+body.codesplash-active .nav-folder-title.is-active {
+    outline: 2px solid var(--ACCENT) !important;
+    color: var(--TEXT) !important;
+}
+
+/* Side Menu: Hover */
+body.codesplash-active .nav-file-title:hover,
+body.codesplash-active .nav-folder-title:hover {
+    outline: 2px solid var(--ACTION);
+}
+
+/* Side Menu: Hover + Active */
+body.codesplash-active .nav-file-title.is-active:hover,
+body.codesplash-active .nav-folder-title.is-active:hover {
+    outline: 2px solid var(--ACCENT) !important;
+    color: var(--TEXT) !important;
+}
+
+/* Main Tab Not Open Hover */
+body.codesplash-active .workspace-tab-header:not(.is-active):hover .workspace-tab-header-inner {
+    color: var(--TEXT) !important;
+    box-shadow: inset 0 0 0 2px var(--ACTION) !important;
+    border-radius: 6px !important;
+}
+
+/* Open Main Tab */
+body.codesplash-active .workspace-tab-header.tappable.is-active {
+    background-color: var(--BACKGROUND-PRIMARY) !important;
+    color: var(--ACCENT) !important;
+}
+
+/* Open Top Left Menu Tab: Active */
+body.codesplash-active .workspace-split.mod-left-split .workspace-tab-header.is-active .workspace-tab-header-inner {
+    background-color: var(--BACKGROUND-SECONDARY) !important;
+    color: var(--ACCENT) !important;
+}
+
+body.codesplash-active .workspace-split.mod-left-split .workspace-tab-header.is-active .svg-icon {
+    stroke: var(--ACCENT) !important;
+}
+
+/* Open Top Left Menu Tab: Hover */
+body.codesplash-active .workspace-split.mod-left-split .workspace-tab-header:not(.is-active):hover .workspace-tab-header-inner {
+    color: var(--ACTION) !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+body.codesplash-active .workspace-split.mod-left-split .workspace-tab-header:not(.is-active):hover .svg-icon {
+    stroke: var(--ACTION) !important;
+}
+
+/* Sidebar Ribbon Icons Hover */
+body.codesplash-active .sidebar-toggle-button:hover,
+body.codesplash-active .workspace-ribbon-collapse-btn:hover,
+body.codesplash-active .side-dock-ribbon-action:hover {
+    color: var(--ACTION) !important;
+}
+
+body.codesplash-active .sidebar-toggle-button:hover .svg-icon,
+body.codesplash-active .workspace-ribbon-collapse-btn:hover .svg-icon,
+body.codesplash-active .side-dock-ribbon-action:hover .svg-icon {
+    stroke: var(--ACTION) !important;
+    color: var(--ACTION) !important;
+}
+
+/* Top Header Container */
+body.codesplash-active .workspace-tab-header-container {
+    background-color: var(--BACKGROUND-SECONDARY) !important;
+}
+
+/* Settings Menu Active Item */
+body.codesplash-active .horizontal-tab-nav-item.is-active,
+body.codesplash-active:not(.is-phone) .vertical-tab-nav-item.is-active {
+    color: var(--TEXT) !important;
+    background-color: var(--BACKGROUND-SECONDARY) !important;
+    outline: 2px solid var(--ACCENT) !important;
+}
+
+/* Settings Menu Not Active Hover */
+body.codesplash-active .horizontal-tab-nav-item:hover,
+body.codesplash-active:not(.is-phone) .vertical-tab-nav-item:hover {
+    color: var(--TEXT) !important;
+    outline: 2px solid var(--ACTION) !important;
+}
+
+/* Create/Rename Folder */
+body.codesplash-active .nav-file-title.is-being-renamed,
+body.codesplash-active .nav-folder-title.is-being-renamed {
+    background-color: var(--BACKGROUND-SECONDARY) !important;
+    color: var(--TEXT) !important;
+}
+
+body.codesplash-active .nav-folder-title.is-being-renamed {
+    outline: 2px solid var(--ACCENT) !important;
+}
+
+body.codesplash-active .nav-file-title.is-being-renamed {
+    outline: 2px solid var(--ACCENT) !important;
+}
+
+/* Tab Close Button Hover */
+body.codesplash-active .workspace-tab-header:not(.is-active):hover .workspace-tab-header-inner-close-button {
+    color: var(--BACKGROUND-SECONDARY) !important;
+}
+
+body.codesplash-active .workspace-tab-header:not(.is-active) .workspace-tab-header-inner-close-button:hover {
+    color: var(--ACTION) !important;
+}
+
+body.codesplash-active .workspace-tab-header.is-active .workspace-tab-header-inner-close-button:hover {
+    background-color: var(--BACKGROUND-PRIMARY) !important;
+    color: var(--ACTION) !important;
+}
+
+/* Toolbar Icons */
+body.codesplash-active .clickable-icon:hover,
+body.codesplash-active .view-action:hover {
+    color: var(--ACTION) !important;
+}
+
+body.codesplash-active .clickable-icon:hover .svg-icon,
+body.codesplash-active .view-action:hover .svg-icon {
+    stroke: var(--ACTION) !important;
+}
+
+body.codesplash-active .workspace-leaf-content[data-type="markdown"] .view-header .view-action:hover,
+body.codesplash-active .workspace-leaf-content[data-type="markdown"] .view-header .clickable-icon:hover {
+    background-color: var(--BACKGROUND-PRIMARY) !important;
+}
+
+body.codesplash-active .modal-close-button:hover {
+    background-color: var(--BACKGROUND-PRIMARY) !important;
+    color: var(--ACTION) !important;
+}
+
+body.codesplash-active .workspace-leaf-content .view-actions .view-action:hover,
+body.codesplash-active .workspace-leaf-content .view-actions .clickable-icon:hover,
+body.codesplash-active .view-actions .view-action:hover,
+body.codesplash-active .view-actions .clickable-icon:hover {
+    background-color: var(--BACKGROUND-SECONDARY) !important;
+}
+
+/* ========================================================================
+   Status-bar menu and window controls (always active)
+   ======================================================================== */
+
+/* Status bar button */
+.theme-statusbar-button {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.theme-statusbar-button:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+/* Window icon */
+.theme-statusbar-icon {
+    font-size: 14px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+}
+
+.theme-statusbar-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Popup menu – hidden by default */
 .theme-statusbar-menu {
     display: none;
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    width: 220px;
+    margin-bottom: 8px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .theme-statusbar-menu.is-active {
     display: block;
 }
 
+/* Menu items */
+.theme-menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+}
+
+.theme-menu-item:last-child {
+    margin-bottom: 0;
+}
+
+.theme-menu-item:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+/* Menu item labels */
+.theme-menu-item span {
+    font-size: 13px;
+    color: var(--text-normal);
+}
+
+/* Checkbox styling */
+.theme-menu-item input[type="checkbox"] {
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Slider styling */
+.theme-menu-item input[type="range"] {
+    cursor: pointer;
+    width: 80px;
+    margin: 0;
+}
+
+/* Dropdown menu items - stack vertically */
+.theme-menu-dropdown {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.theme-menu-dropdown select {
+    width: 100%;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    color: var(--text-normal);
+    cursor: pointer;
+}
+
+.theme-menu-dropdown select:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+/* Slider menu items */
+.theme-menu-slider {
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.theme-menu-slider input[type="range"] {
+    width: 100%;
+}
+
+/* Slider tooltip (matches Obsidian's native tooltip) – hidden by default */
 .slider-tooltip {
     display: none;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #000;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1001;
 }
 
 .slider-tooltip.is-active {
     display: block;
+}
+
+.slider-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #000;
 }
