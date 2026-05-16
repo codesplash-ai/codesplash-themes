@@ -1,6 +1,6 @@
 {
   "name": "codesplash-themes",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An Obsidian plugin for managing and switching between custom color themes",
   "main": "main.js",
   "scripts": {
