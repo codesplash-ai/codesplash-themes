@@ -136,11 +136,16 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	/**
 	 * Switch Obsidian between light and dark mode
 	 */
+	private getActiveBody(): HTMLElement {
+		return activeDocument.body;
+	}
+
 	private getCurrentMode(): ThemeMode {
-		if (document.body.classList.contains("theme-dark")) {
+		const body = this.getActiveBody();
+		if (body.classList.contains("theme-dark")) {
 			return "dark";
 		}
-		if (document.body.classList.contains("theme-light")) {
+		if (body.classList.contains("theme-light")) {
 			return "light";
 		}
 		return this.app.isDarkMode() ? "dark" : "light";
@@ -277,10 +282,7 @@ export default class ThemeSwitcherPlugin extends Plugin {
 	 * Last-resort mode switch by flipping body classes.
 	 */
 	private forceModeBodyClasses(targetMode: ThemeMode): boolean {
-		const body = document.body;
-		if (!body) {
-			return false;
-		}
+		const body = this.getActiveBody();
 
 		body.classList.toggle("theme-dark", targetMode === "dark");
 		body.classList.toggle("theme-light", targetMode === "light");
@@ -339,7 +341,7 @@ export default class ThemeSwitcherPlugin extends Plugin {
 				this.applyCurrentTheme();
 			}
 		});
-		this.themeChangeObserver.observe(document.body, {
+		this.themeChangeObserver.observe(this.getActiveBody(), {
 			attributes: true,
 			attributeFilter: ['class']
 		});
@@ -487,7 +489,7 @@ export default class ThemeSwitcherPlugin extends Plugin {
 		this.statusBarItem.addClass("theme-statusbar-button");
 
 		// Add window icon
-		const icon = this.statusBarItem.createEl("span", {
+		const icon = this.statusBarItem.createSpan({
 			cls: "theme-statusbar-icon",
 		});
 		try {
@@ -628,7 +630,7 @@ export default class ThemeSwitcherPlugin extends Plugin {
 		});
 
 		// Close menu when clicking outside
-		this.registerDomEvent(document, "click", () => {
+		this.registerDomEvent(activeDocument, "click", () => {
 			menu.removeClass("is-active");
 		});
 	}

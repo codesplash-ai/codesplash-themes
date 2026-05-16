@@ -1,5 +1,3 @@
-// eslint.config.mjs
-import globals from "globals";
 import tsparser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
@@ -11,7 +9,16 @@ export default defineConfig([
     languageOptions: {
       parser: tsparser,
       parserOptions: { project: "./tsconfig.json" },
-      globals: globals.browser,
+      globals: {
+        activeDocument: "readonly",
+        Blob: "readonly",
+        createEl: "readonly",
+        DOMParser: "readonly",
+        document: "readonly",
+        MutationObserver: "readonly",
+        URL: "readonly",
+        window: "readonly",
+      },
     },
 
     // You can add your own configuration to override or add rules

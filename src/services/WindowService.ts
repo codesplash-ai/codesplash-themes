@@ -49,6 +49,10 @@ interface ElectronBrowserWindow {
  * Gracefully handles mobile/unsupported platforms
  */
 export class WindowService {
+	private getActiveBody(): HTMLElement {
+		return activeDocument.body;
+	}
+
 	/**
 	 * Check if platform supports Electron window features
 	 */
@@ -128,11 +132,11 @@ export class WindowService {
 			if (vibrancy === "default") {
 				// Disable vibrancy
 				win.setVibrancy(null);
-				document.body.removeClass("is-translucent");
+				this.getActiveBody().removeClass("is-translucent");
 			} else {
 				// Enable vibrancy with specified type
 				win.setVibrancy(vibrancy);
-				document.body.addClass("is-translucent");
+				this.getActiveBody().addClass("is-translucent");
 			}
 		} catch {
 			//("Failed to set vibrancy:", error);

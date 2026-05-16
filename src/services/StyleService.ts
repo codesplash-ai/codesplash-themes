@@ -1,7 +1,7 @@
 import { Theme, ThemeMode } from "../models/Theme";
 
 /**
- * Service for managing theme CSS via custom properties on document.body.
+ * Service for managing theme CSS via custom properties on activeDocument.body.
  *
  * Static CSS rules live in styles.css (auto-loaded by Obsidian) and are
  * gated behind the `body.codesplash-active` class.  This service toggles
@@ -13,7 +13,7 @@ export class StyleService {
 	private themeActive = false;
 
 	/**
-	 * Apply a theme by setting CSS custom properties on document.body
+	 * Apply a theme by setting CSS custom properties on activeDocument.body
 	 * and activating the codesplash-active gate class.
 	 */
 	applyTheme(theme: Theme, _modeOverride?: ThemeMode): void {
@@ -21,7 +21,7 @@ export class StyleService {
 		this.clearTrackedProperties();
 
 		// Activate static CSS rules in styles.css
-		document.body.classList.add("codesplash-active");
+		this.getActiveBody().classList.add("codesplash-active");
 		this.themeActive = true;
 
 		// Layer 1: palette colours  e.g. --kiro-purple: #b080ff
@@ -50,7 +50,7 @@ export class StyleService {
 	 * Remove all applied theme styles
 	 */
 	removeTheme(): void {
-		document.body.classList.remove("codesplash-active");
+		this.getActiveBody().classList.remove("codesplash-active");
 		this.themeActive = false;
 		this.clearTrackedProperties();
 	}
@@ -62,14 +62,19 @@ export class StyleService {
 		return this.themeActive;
 	}
 
+	private getActiveBody(): HTMLElement {
+		return activeDocument.body;
+	}
+
 	private setProperty(name: string, value: string): void {
-		document.body.style.setProperty(name, value);
+		this.getActiveBody().style.setProperty(name, value);
 		this.trackedProperties.push(name);
 	}
 
 	private clearTrackedProperties(): void {
+		const body = this.getActiveBody();
 		for (const prop of this.trackedProperties) {
-			document.body.style.removeProperty(prop);
+			body.style.removeProperty(prop);
 		}
 		this.trackedProperties = [];
 	}

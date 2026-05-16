@@ -684,9 +684,12 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 	 * Import theme from JSON file
 	 */
 	private importTheme(): void {
-		const input = document.createElement("input");
-		input.type = "file";
-		input.accept = ".json";
+		const input = createEl("input", {
+			type: "file",
+			attr: {
+				accept: ".json",
+			},
+		});
 		input.onchange = (e) => {
 			void (async () => {
 				const file = (e.target as HTMLInputElement).files?.[0];
@@ -710,6 +713,17 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 		input.click();
 	}
 
+	private downloadBlob(filename: string, blob: Blob): void {
+		const url = URL.createObjectURL(blob);
+		const link = createEl("a");
+		link.href = url;
+		link.download = filename;
+		activeDocument.body.appendChild(link);
+		link.click();
+		link.remove();
+		URL.revokeObjectURL(url);
+	}
+
 	/**
 	 * Export a single theme
 	 */
@@ -724,12 +738,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 		if (!theme) return;
 
 		const blob = new Blob([json], { type: "application/json" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = `${theme.id}.json`;
-		a.click();
-		URL.revokeObjectURL(url);
+		this.downloadBlob(`${theme.id}.json`, blob);
 
 		new Notice(`Exported: ${theme.name}`);
 	}
@@ -746,12 +755,7 @@ export class ThemeSwitcherSettingTab extends PluginSettingTab {
 
 		const json = JSON.stringify(themes, null, 2);
 		const blob = new Blob([json], { type: "application/json" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = "themes.json";
-		a.click();
-		URL.revokeObjectURL(url);
+		this.downloadBlob("themes.json", blob);
 
 		new Notice(`Exported ${themes.length} theme(s)`);
 	}
