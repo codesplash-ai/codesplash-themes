@@ -753,3 +753,18 @@ body.codesplash-active .view-actions .clickable-icon:hover {
     border: 4px solid transparent;
     border-top-color: #000;
 }
+
+.whats-new-modal .whats-new-entry {
+    margin-bottom: 1.5em;
+}
+
+.whats-new-modal .whats-new-screenshot {
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+
+.whats-new-modal .whats-new-tutorial {
+    color: var(--text-muted);
+    font-size: 0.9em;
+}

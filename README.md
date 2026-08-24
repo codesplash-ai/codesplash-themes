@@ -17,6 +17,10 @@ A powerful Obsidian plugin that lets you create, manage, and switch between cust
 - **Self-Contained**: Includes all base styling - no need for separate CSS snippets
 - **Light & Dark Mode Support**: Base styles work with both Obsidian light and dark themes
 
+## Network Use
+
+After a plugin update, the plugin fetches release notes from `https://codesplash.ai/updates/feed/themes` to show a What's New dialog. No vault data is ever sent.
+
 ## Installation
 
 ### Manual Installation

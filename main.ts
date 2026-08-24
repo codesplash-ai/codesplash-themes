@@ -4,6 +4,7 @@ import { StyleService } from "./src/services/StyleService";
 import { WindowService, VibrancyType, VIBRANCY_OPTIONS } from "./src/services/WindowService";
 import { ThemeSwitcherSettingTab } from "./src/settings";
 import { Theme, ThemeMode } from "./src/models/Theme";
+import { WhatsNewModal, compareVersions, fetchWhatsNewEntries } from "./src/WhatsNewModal";
 import iconSvg from "./assets/palette.svg";
 
 interface WindowSettings {
@@ -15,12 +16,14 @@ interface WindowSettings {
 interface ThemeSwitcherSettings {
 	themes: Theme[];
 	activeThemeId: string | null;
+	lastSeenVersion: string | null;
 	windowSettings: WindowSettings;
 }
 
 const DEFAULT_SETTINGS: ThemeSwitcherSettings = {
 	themes: [],
 	activeThemeId: null,
+	lastSeenVersion: null,
 	windowSettings: {
 		alwaysOnTop: false,
 		opacity: 1.0,
@@ -108,6 +111,39 @@ export default class ThemeSwitcherPlugin extends Plugin {
 			},
 		});
 
+		// Show release notes when the plugin was updated since last launch
+		void this.checkWhatsNew();
+	}
+
+	/**
+	 * Show a What's New modal for versions between lastSeenVersion and the
+	 * installed version. First run baselines silently; fetch failures retry
+	 * on the next launch.
+	 */
+	private async checkWhatsNew() {
+		const currentVersion = this.manifest.version;
+		const lastSeen = this.settings.lastSeenVersion;
+		if (!lastSeen) {
+			this.settings.lastSeenVersion = currentVersion;
+			await this.saveSettings();
+			return;
+		}
+		if (compareVersions(lastSeen, currentVersion) >= 0) {
+			return;
+		}
+		const entries = await fetchWhatsNewEntries(lastSeen, currentVersion);
+		if (!entries) {
+			return;
+		}
+		const markSeen = async () => {
+			this.settings.lastSeenVersion = currentVersion;
+			await this.saveSettings();
+		};
+		if (entries.length === 0) {
+			await markSeen();
+			return;
+		}
+		new WhatsNewModal(this.app, entries, () => void markSeen()).open();
 	}
 
 	/**
